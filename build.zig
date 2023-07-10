@@ -27,20 +27,21 @@ pub fn build(b: *std.Build) void {
     //exe.subsystem = std.Target.SubSystem.Windows;
 
     const c_mod = b.addModule("c", .{ .source_file = .{ .path = "src/c.zig" } });
-    // const cpp_mod = b.addModule("cpp", .{ .source_file = .{ .path = "lib/cpp.zig" } });
-    // const imgui_mod = b.addModule("imgui", .{
-    //     .source_file = .{ .path = "lib/imgui/imgui.zig" },
-    //     .dependencies = &.{
-    //         .{ .name = "c", .module = c_mod },
-    //         .{ .name = "cpp", .module = cpp_mod },
-    //     },
-    // });
+
+    const cpp_mod = b.addModule("cpp", .{ .source_file = .{ .path = "lib/cpp.zig" } });
+    const imgui_mod = b.addModule("imgui", .{
+        .source_file = .{ .path = "lib/imgui/imgui.zig" },
+        .dependencies = &.{
+            .{ .name = "c", .module = c_mod },
+            .{ .name = "cpp", .module = cpp_mod },
+        },
+    });
 
     // other single headers libs
     exe.addIncludePath("./lib");
     exe.addModule("c", c_mod);
-    // exe.addModule("imgui", imgui_mod);
-    // exe.addModule("cpp", cpp_mod);
+    exe.addModule("imgui", imgui_mod);
+    exe.addModule("cpp", cpp_mod);
 
     // include, link and install sdl2
     exe.linkLibC();
@@ -60,6 +61,7 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
     imgui_lib.addIncludePath("./lib/imgui");
+    imgui_lib.addIncludePath("./lib/imgui/backends");
     imgui_lib.linkLibC();
     imgui_lib.linkLibCpp();
     const cflags = &.{"-fno-sanitize=undefined"};
@@ -76,10 +78,10 @@ pub fn build(b: *std.Build) void {
     imgui_lib.addIncludePath("./lib/SDL2/include");
     imgui_lib.addCSourceFile("./lib/imgui/backends/imgui_impl_opengl3.cpp", cflags);
     imgui_lib.addCSourceFile("./lib/imgui/backends/imgui_impl_sdl2.cpp", cflags);
-    // // glue
-    // imgui_lib.addCSourceFile("./lib/imgui/imgui_glue.cpp", cflags);
-    // imgui_lib.addCSourceFile("./lib/imgui/imgui_impl_opengl3_glue.cpp", cflags);
-    // imgui_lib.addCSourceFile("./lib/imgui/imgui_impl_sdl2_glue.cpp", cflags);
+    // glue
+    imgui_lib.addCSourceFile("./lib/imgui/imgui_glue.cpp", cflags);
+    imgui_lib.addCSourceFile("./lib/imgui/imgui_impl_opengl3_glue.cpp", cflags);
+    imgui_lib.addCSourceFile("./lib/imgui/imgui_impl_sdl2_glue.cpp", cflags);
     exe.linkLibrary(imgui_lib);
 
     // This declares intent for the executable to be installed into the

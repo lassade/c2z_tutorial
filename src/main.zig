@@ -2,7 +2,7 @@ const std = @import("std");
 const log = std.log;
 
 const c = @import("c");
-//const imgui = @import("imgui");
+const imgui = @import("imgui");
 
 pub fn main() void {
     // Initialize SDL
@@ -24,19 +24,19 @@ pub fn main() void {
     };
     defer c.SDL_GL_DeleteContext(context);
 
-    // _ = imgui.CreateContext(null);
-    // const io = imgui.GetIO();
-    // // io.*.ConfigFlags |= c.ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-    // // io.*.ConfigFlags |= c.ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
-    // imgui.StyleColorsDark(null);
+    _ = imgui.CreateContext(.{});
+    const io = imgui.GetIO();
+    // io.*.ConfigFlags |= c.ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    // io.*.ConfigFlags |= c.ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+    imgui.StyleColorsDark(.{});
 
-    // // setup platform and renderer backends
-    // _ = imgui.sdl2.initForOpenGL(window, context);
-    // defer _ = imgui.sdl2.shutdown();
-    // _ = imgui.gl3.init(null);
-    // defer _ = imgui.gl3.shutdown();
+    // setup platform and renderer backends
+    _ = imgui.sdl2.initForOpenGL(window, context);
+    defer _ = imgui.sdl2.shutdown();
+    _ = imgui.gl3.init(.{});
+    defer _ = imgui.gl3.shutdown();
 
-    // var f: f32 = 0.0;
+    var f: f32 = 0.0;
     var buf: [128:0]u8 = undefined;
     @memset(&buf, 0);
 
@@ -51,31 +51,31 @@ pub fn main() void {
                     quit = true;
                 }
             }
-            // _ = imgui.sdl2.processEvent(&event);
+            _ = imgui.sdl2.processEvent(&event);
         }
 
-        // // start the Dear ImGui frame
-        // _ = imgui.gl3.newFrame();
-        // _ = imgui.sdl2.newFrame();
-        // imgui.NewFrame();
+        // start the Dear ImGui frame
+        _ = imgui.gl3.newFrame();
+        _ = imgui.sdl2.newFrame();
+        imgui.NewFrame();
 
-        // var show_demo_window = true;
-        // imgui.ShowDemoWindow(&show_demo_window);
+        imgui.ShowDemoWindow(.{});
 
-        // if (imgui.Begin("My Window", .{})) {
-        //     _ = imgui.Text("Hello, world %d", @as(c_int, 123));
-        //     if (imgui.Button("Save", .{})) {}
-        //     _ = imgui.InputText("string", &buf, .{});
-        //     // _ = imgui.SliderFloat("float", &f, 0.0, 1.0, "%.3f", 0);
-        // }
-        // imgui.End();
+        if (imgui.Begin("My Window", .{})) {
+            // intended way varidact function will be handled
+            _ = imgui.Text__VA("Hello, world %d", @as(c_int, 123));
+            if (imgui.Button("Save", .{})) {}
+            _ = imgui.InputText("string", &buf, buf.len, .{});
+            _ = imgui.SliderFloat("float1", &f, 0, 1, .{});
+        }
+        imgui.End();
 
-        // // imgui rendering
-        // imgui.Render();
-        // c.glViewport(0, 0, @floatToInt(c_int, io.*.DisplaySize.x), @floatToInt(c_int, io.*.DisplaySize.y));
-        // c.glClearColor(0.2, 0.3, 0.4, 1.0);
-        // c.glClear(c.GL_COLOR_BUFFER_BIT);
-        // _ = imgui.gl3.renderDrawData(imgui.GetDrawData());
+        // imgui rendering
+        imgui.Render();
+        c.glViewport(0, 0, @floatToInt(c_int, io.*.DisplaySize.x), @floatToInt(c_int, io.*.DisplaySize.y));
+        c.glClearColor(0.2, 0.3, 0.4, 1.0);
+        c.glClear(c.GL_COLOR_BUFFER_BIT);
+        _ = imgui.gl3.renderDrawData(imgui.GetDrawData());
 
         c.SDL_GL_SwapWindow(window);
     }
